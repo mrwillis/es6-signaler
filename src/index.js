@@ -6,17 +6,35 @@ let app = express();
 let server = http.Server(app);
 let io = SocketIO(server);
 
+let users = {};
 
-app.get('/', (req, res) =>{
+
+app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
 
 io.on('connection', (socket) => {
     "use strict";
-   socket.emit('news', {hello: 'world'});
-   socket.on('my other event', (data) => {
-       console.log(data)
-   })
+    console.log('a new user connected');
+
+    socket.on('login', (username) => {
+        console.log("User logged in", username);
+        if (users[username]) {
+            socket.to(socket.id).emit({success: false})
+        }
+        else {
+            socket.username = username;
+            users[username] = socket;
+            socket.to(socket.id).emit({success: true})
+        }
+    });
+
+    socket.on('disconnect', () => {
+        console.log('a user disconnected');
+        if (users[socket.username]) {
+            delete users[socket.username]
+        }
+    });
 });
 
 server.listen(80, () => {
