@@ -1,7 +1,7 @@
 import http from 'http'
 import express from 'express'
 import SocketIO from 'socket.io'
-import Room from 'src/Room'
+import Room from './Room'
 import bodyParser from 'body-parser'
 
 
